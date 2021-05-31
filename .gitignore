@@ -1,0 +1,7 @@
+.idea
+.env
+artifacts
+build
+cache
+node_modules
+types
