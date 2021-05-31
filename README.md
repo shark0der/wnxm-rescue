@@ -2,7 +2,7 @@
 
 ## Running tests
 
-This repo uses `eth_setNonce` from unreleased hardhat from this pull request: https://github.com/nomiclabs/hardhat/pull/1435
+This repo uses `hardhat_setNonce` from unreleased hardhat from this pull request: https://github.com/nomiclabs/hardhat/pull/1435
 
 To install:
 
@@ -24,4 +24,3 @@ npm link hardhat
 
 npx hardhat test
 ```
-
