@@ -12,8 +12,7 @@ module.exports = {
   networks: {
     hardhat: {
       allowUnlimitedContractSize: true,
-      // forking: { url: PROVIDER_URL, blockNumber: 7891362 },
-      forking: { url: PROVIDER_URL, blockNumber: parseInt(process.env.FORK_BLOCK, 16) },
+      forking: { url: PROVIDER_URL },
       blockGasLimit: 15e6,
       gas: 15e6,
     },

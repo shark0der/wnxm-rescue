@@ -11,7 +11,7 @@ describe('Rescuer', async function () {
   this.timeout(0);
   this.slow(0);
 
-  it('increment nonce', async function () {
+  it('increment nonce and rescue', async function () {
 
     console.log('Impersonating accounts');
     await network.provider.send('hardhat_impersonateAccount', [DEPLOYER]);
@@ -25,40 +25,27 @@ describe('Rescuer', async function () {
     });
 
     const deployer = ethers.provider.getSigner(DEPLOYER);
-    const promises = [];
-    let nonce = await ethers.provider.getTransactionCount(DEPLOYER);
 
-    console.log('Sending txes');
-
-    while (nonce < TARGET_NONCE) {
-      promises.push(
-        deployer.sendTransaction({
-          to: ethers.constants.AddressZero,
-          nonce: nonce++, // use n and then increment to n+1
-        }),
-      );
-    }
-
-    console.log('Waiting txes to get mined');
-    await Promise.all(promises);
-
-    const currentNonce = await ethers.provider.getTransactionCount(DEPLOYER);
-    console.log(`Current nonce ${currentNonce}`);
-    console.log(`Target nonce ${TARGET_NONCE}`);
+    console.log('Setting nonce');
+    // https://github.com/nomiclabs/hardhat/pull/1435
+    await network.provider.send('hardhat_setNonce', [DEPLOYER, '0x' + TARGET_NONCE.toString(16)]);
 
     console.log('Deploying contract');
     const Rescuer = await ethers.getContractFactory('Rescuer', deployer);
     const rescuer = await Rescuer.deploy();
     await rescuer.deployed();
 
-    const eth = await ethers.getContractFactory('IERC20', deployer).deploy();
-    await eth.deployed();
+    const eth = await ethers.getContractAt('IERC20', ETH, deployer);
 
     console.log(`Deployed Rescuer at ${rescuer.address}`);
     assert.strictEqual(WNXM.toLowerCase(), rescuer.address.toLowerCase());
 
+    console.log('Claiming tokens');
     await rescuer.claimTokens([ETH]);
-    const ethBalance = await eth.balanceOf(deployer.address);
+
+    console.log('Checking balance');
+    const ethBalance = await eth.balanceOf(DEPLOYER);
+
     console.log(`Rescued ${ethers.utils.formatEther(ethBalance)} ETH`);
   });
 
