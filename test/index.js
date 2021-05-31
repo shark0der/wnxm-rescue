@@ -35,8 +35,6 @@ describe('Rescuer', async function () {
     const rescuer = await Rescuer.deploy();
     await rescuer.deployed();
 
-    const eth = await ethers.getContractAt('IERC20', ETH, deployer);
-
     console.log(`Deployed Rescuer at ${rescuer.address}`);
     assert.strictEqual(WNXM.toLowerCase(), rescuer.address.toLowerCase());
 
@@ -44,6 +42,7 @@ describe('Rescuer', async function () {
     await rescuer.claimTokens([ETH]);
 
     console.log('Checking balance');
+    const eth = await ethers.getContractAt('IERC20', ETH, deployer);
     const ethBalance = await eth.balanceOf(DEPLOYER);
 
     console.log(`Rescued ${ethers.utils.formatEther(ethBalance)} ETH`);
